@@ -14,6 +14,9 @@ Currently contains a selection of junk that comes with Windows 11.
 
 Depending on environment settings, you may need to open an elevated PS window and run the following command to enable running PS scripts:
 'Set-ExecutionPolicy -ExecutionPolicy Unrestricted'
+
+If you wish to find a list of apps installed in the format needed for this script, use this command in a PS window:
+'Get-AppxPackage –AllUsers | Select Name, PackageFullName'
 /************************************************************/
 #>
 
