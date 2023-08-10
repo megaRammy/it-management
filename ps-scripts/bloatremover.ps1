@@ -16,26 +16,16 @@ Depending on environment settings, you may need to open an elevated PS window an
 'Set-ExecutionPolicy -ExecutionPolicy Unrestricted'
 
 If you wish to find a list of apps installed in the format needed for this script, use this command in a PS window:
-'Get-AppxPackage –AllUsers | Select Name, PackageFullName'
+'Get-AppxPackage | Select Name, PackageFullName'
 /************************************************************/
 #>
 
 # Elevate to Admin (UAC) (this is just grabbed from StackOverflow, can't tell you how it works. It works though! 😊)
-param([switch]$Elevated)
-
-function Test-Admin {
-    $currentUser = New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())
-    $currentUser.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
-}
-
-if ((Test-Admin) -eq $false)  {
-    if ($elevated) {
-        # tried to elevate, did not work, aborting
-    } else {
-       set-executionpolicy bypass
-        Start-Process powershell.exe -Verb RunAs -ArgumentList ('-noprofile -noexit -file "{0}" -elevated' -f ($myinvocation.MyCommand.Definition))
-    }
-    exit
+If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+{
+  # Relaunch as an elevated process:
+  Start-Process powershell.exe "-File",('"{0}"' -f $MyInvocation.MyCommand.Path) -Verb RunAs
+  exit
 }
 
 # Remove Default Installed Stuff
@@ -54,6 +44,9 @@ $appname = @(
 "*Microsoft.People*" # Microsoft People
 "*Microsoft.MicrosoftOfficeHub*" # Microsoft Office Hub
 "*Microsoft.Todos*" # Microsoft Todo
+"*Microsoft.Messaging*" # Microsoft Messaging
+"*MixedReality.Portal*" # Mixed Reality Portal
+"*Microsoft.Office.OneNote*" # OneNote
 )
 
 ForEach($app in $appname){
