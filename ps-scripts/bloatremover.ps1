@@ -28,6 +28,9 @@ If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
   exit
 }
 
+# List Currently Installed Apps into file on Desktop
+Get-AppxPackage | Select Name, PackageFullName | Out-File -FilePath $env:USERPROFILE\Desktop\$env:computername-prewipe-apps.txt
+
 # Remove Default Installed Stuff
 $appname = @(
 "*SkypeApp*" # Skype
@@ -50,15 +53,18 @@ $appname = @(
 )
 
 ForEach($app in $appname){
-Get-AppxPackage -Name $app | Remove-AppxPackage -ErrorAction SilentlyContinue
-Get-AppXProvisionedPackage -Online | Where-Object DisplayName -like $app | Remove-AppxProvisionedPackage -Online
+Get-AppxPackage -Name $app | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
+Get-AppXProvisionedPackage -Online | Where-Object DisplayName -like $app | Remove-AppxProvisionedPackage -AllUsers -Online
 }
 
 #Disable Windows Recovery Partition
 reagentc.exe /disable
 
+# List Currently Installed Apps into file on Desktop
+Get-AppxPackage | Select Name, PackageFullName | Out-File -FilePath $env:USERPROFILE\Desktop\$env:computername-postwipe-apps.txt
+
 #Disable running .ps1 Powershell scripts
 #Set-ExecutionPolicy -ExecutionPolicy Restricted
 
 #Delete script file
-#Remove-Item $PSCommandPath -Force 
+Remove-Item $PSCommandPath -Force 
