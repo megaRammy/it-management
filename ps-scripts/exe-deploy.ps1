@@ -22,23 +22,33 @@ $app_name = 'ProgramName'
 $app_version = '1.0.0'
 # Folder the program installs to locally
 $install_folder = 'C:\Program Files\ProgramFolder'
-# Path to the exe installer on deployment server
+# Path to the exe installer on deployment server (avoid blank spaces)
 $install_exe = '\\alder-nas10\Deployment\ProgramName\Program.exe'
 
 <#
 Don't touch these ones unless you know what you're doing
 #>
 
-# Path to file/folder made in program's install folder to store current deployed version
-$version_check = $install_folder,'\.deploy\version_deployed\',$app_version,'.version' -join ""
+# Path to folder made in program's install folder to store deployment info
+$deploy_folder = $install_folder,'\.deploy' -join ""
+# Path to the version deployed folder
+$version_folder = $deploy_folder,'\version_deployed' -join ""
+# Path to the version number file
+$version_check = $version_folder,'\',$app_version,'.version' -join ""
 
 Write-Output "Checking for previous version: $version_check"
 # Checks for version currently deployed
 if (-not (Test-Path -Path $version_check)) {
     Write-Output "Installing $app_name"
     # Installs the app
-    Start-Process -FilePath $install_exe -Verb runAs -ArgumentList '--silent','--desktop_shortcut'  -Wait -Passthru
+    Start-Process -FilePath $install_exe -Verb runAs -ArgumentList ''  -Wait -Passthru
     # Marks the version deployed
+    if (-not (Test-Path -Path $deploy_folder)) {
+        New-Item $deploy_folder -Type Directory   
+    }
+    if (-not (Test-Path -Path $version_folder)) {
+        New-Item $version_folder -Type Directory
+    }
     New-Item -Path $version_check -ItemType File
 }
 
