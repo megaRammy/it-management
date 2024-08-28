@@ -32,10 +32,10 @@ Don't touch these ones unless you know what you're doing
 # Path to file/folder made in program's install folder to store current deployed version
 $version_check = $install_folder,'\.deploy\version_deployed\',$app_version,'.version' -join ""
 
-Write-Output "Checking for previous version: ",$version_check -join ""
+Write-Output "Checking for previous version: $version_check"
 # Checks for version currently deployed
 if (-not (Test-Path -Path $version_check)) {
-    Write-Output "Installing ",$app_name -join ""
+    Write-Output "Installing $app_name"
     # Installs the app
     Start-Process -FilePath $install_exe -Verb runAs -ArgumentList '--silent','--desktop_shortcut'  -Wait -Passthru
     # Marks the version deployed
@@ -44,5 +44,5 @@ if (-not (Test-Path -Path $version_check)) {
 
 # Skips everything if version deployed
 else {
-    Write-Output "Skipping install of", $app_name -join ""
+    Write-Output "Skipping install of $app_name"
  }
